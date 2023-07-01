@@ -1,8 +1,13 @@
 module Types exposing (..)
 
+import Browser exposing (UrlRequest)
+import Browser.Navigation exposing (Key)
+import Url exposing (Url)
+
 
 type alias FrontendModel =
-    { message : String
+    { key : Key
+    , message : String
     }
 
 
@@ -12,7 +17,9 @@ type alias BackendModel =
 
 
 type FrontendMsg
-    = NoOpFrontendMsg
+    = UrlClicked UrlRequest
+    | UrlChanged Url
+    | NoOpFrontendMsg
 
 
 type ToBackend
