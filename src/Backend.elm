@@ -26,6 +26,7 @@ init =
     ( { message = "Hello!"
       , headers = ApiData.NotAsked
       , dependencies = ApiData.NotAsked
+      , clients = []
       }
     , getAllHeaders
     )
@@ -35,15 +36,19 @@ update : BackendMsg -> Model -> ( Model, Cmd BackendMsg )
 update msg model =
     case msg of
         ClientConnected _ clientId ->
-            ( model
+            ( { model | clients = clientId :: model.clients }
             , Lamdera.sendToFrontend clientId <| GotHeaders model.headers
             )
 
-        RequestedAllHeaders apiData ->
-            ( { model | headers = ApiData.fromResult apiData }
+        ClientDisconnected _ clientId ->
+            ( { model | clients = List.filter (\c -> c /= clientId) model.clients }
             , Cmd.none
             )
-                |> Debug.log "requested all headers"
+
+        RequestedAllHeaders apiData ->
+            ( { model | headers = ApiData.fromResult apiData |> Debug.log "headers output" }
+            , Cmd.none
+            )
 
 
 updateFromFrontend : SessionId -> ClientId -> ToBackend -> Model -> ( Model, Cmd BackendMsg )
@@ -70,4 +75,5 @@ subscriptions : Model -> Sub BackendMsg
 subscriptions model =
     Sub.batch
         [ Lamdera.onConnect ClientConnected
+        , Lamdera.onDisconnect ClientDisconnected
         ]

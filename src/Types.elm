@@ -21,6 +21,7 @@ type alias BackendModel =
     { message : String
     , headers : ApiData (List Meta)
     , dependencies : ApiData (List Dependency)
+    , clients : List ClientId
     }
 
 
@@ -37,6 +38,7 @@ type ToBackend
 type BackendMsg
     = RequestedAllHeaders (Result Http.Error (List Meta))
     | ClientConnected SessionId ClientId
+    | ClientDisconnected SessionId ClientId
 
 
 type ToFrontend
