@@ -31,7 +31,7 @@ decoder =
         |> Pipeline.required "dependencies" (Decode.dict Decode.string)
 
 
-filter : List Package -> String -> List Package
+filter : List Package -> String -> List ( String, Package )
 filter packages dependencyName =
     let
         index : List ( String, Package )
@@ -46,7 +46,7 @@ filter packages dependencyName =
     List.filterMap
         (\( dep, package ) ->
             if String.contains dependencyName dep then
-                Just package
+                Just ( dep, package )
 
             else
                 Nothing

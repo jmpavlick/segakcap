@@ -12,3 +12,11 @@ view package =
             , label = Element.text <| package.name
             }
         ]
+
+
+viewGroup : { dependencyName : String, packages : List Package } -> Element msg
+viewGroup { dependencyName, packages } =
+    Element.column []
+        [ Element.el [] <| Element.text dependencyName
+        , Element.column [] <| List.map view packages
+        ]
