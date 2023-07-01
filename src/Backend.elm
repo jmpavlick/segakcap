@@ -5,6 +5,7 @@ import ApiData
 import Http
 import Json.Decode as Decode
 import Lamdera exposing (ClientId, SessionId)
+import Time
 import Types exposing (..)
 
 
@@ -23,12 +24,11 @@ app =
 
 init : ( Model, Cmd BackendMsg )
 init =
-    ( { message = "Hello!"
-      , headers = ApiData.NotAsked
+    ( { headers = ApiData.Loading
       , dependencies = ApiData.NotAsked
       , clients = []
       }
-    , getAllHeaders
+    , getAllHeaders |> Debug.log "getAllHeaders fired from init"
     )
 
 
@@ -50,6 +50,12 @@ update msg model =
             , Cmd.none
             )
 
+        SyncFired ->
+            ( model
+            , List.map (\c -> Lamdera.sendToFrontend c <| GotHeaders model.headers) model.clients
+                |> Cmd.batch
+            )
+
 
 updateFromFrontend : SessionId -> ClientId -> ToBackend -> Model -> ( Model, Cmd BackendMsg )
 updateFromFrontend sessionId clientId msg model =
@@ -64,7 +70,6 @@ getAllHeaders =
         { url = "https://package.elm-lang.org/search.json"
         , expect = Http.expectJson RequestedAllHeaders (Decode.list Header.decoder)
         }
-        |> Debug.log "requested all headers"
 
 
 
@@ -76,4 +81,6 @@ subscriptions model =
     Sub.batch
         [ Lamdera.onConnect ClientConnected
         , Lamdera.onDisconnect ClientDisconnected
+
+        --, Time.every 1000 (always SyncFired)
         ]

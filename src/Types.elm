@@ -12,14 +12,12 @@ import Url exposing (Url)
 
 type alias FrontendModel =
     { key : Key
-    , message : String
     , headers : ApiData (List Meta)
     }
 
 
 type alias BackendModel =
-    { message : String
-    , headers : ApiData (List Meta)
+    { headers : ApiData (List Meta)
     , dependencies : ApiData (List Dependency)
     , clients : List ClientId
     }
@@ -39,6 +37,7 @@ type BackendMsg
     = RequestedAllHeaders (Result Http.Error (List Meta))
     | ClientConnected SessionId ClientId
     | ClientDisconnected SessionId ClientId
+    | SyncFired
 
 
 type ToFrontend
