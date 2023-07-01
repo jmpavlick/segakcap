@@ -1,7 +1,7 @@
 module Types exposing (..)
 
-import Api.Dependency as Dependency exposing (Dependency)
-import Api.Meta as Header exposing (Meta)
+import Api.Meta exposing (Meta)
+import Api.Package exposing (Package)
 import ApiData exposing (ApiData)
 import Browser exposing (UrlRequest)
 import Browser.Navigation exposing (Key)
@@ -12,14 +12,13 @@ import Url exposing (Url)
 
 type alias FrontendModel =
     { key : Key
-    , headers : ApiData (List Meta)
+    , packages : List Package
     }
 
 
 type alias BackendModel =
-    { headers : ApiData (List Meta)
-    , dependencies : ApiData (List Dependency)
-    , clients : List ClientId
+    { clients : List ClientId
+    , packages : List Package
     }
 
 
@@ -34,11 +33,11 @@ type ToBackend
 
 
 type BackendMsg
-    = RequestedAllHeaders (Result Http.Error (List Meta))
-    | ClientConnected SessionId ClientId
+    = ClientConnected SessionId ClientId
     | ClientDisconnected SessionId ClientId
-    | SyncFired
+    | GotMetaResponse (Result Http.Error (List Meta))
+    | GotPackageResponse (Result Http.Error Package)
 
 
 type ToFrontend
-    = GotHeaders (ApiData (List Meta))
+    = GotPackages (List Package)

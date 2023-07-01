@@ -1,11 +1,10 @@
 module Backend exposing (..)
 
-import Api.Meta as Header
-import ApiData
+import Api.Meta as Meta exposing (Meta)
+import Api.Package as Package exposing (Package)
 import Http
 import Json.Decode as Decode
 import Lamdera exposing (ClientId, SessionId)
-import Time
 import Types exposing (..)
 
 
@@ -24,11 +23,10 @@ app =
 
 init : ( Model, Cmd BackendMsg )
 init =
-    ( { headers = ApiData.Loading
-      , dependencies = ApiData.NotAsked
-      , clients = []
+    ( { clients = []
+      , packages = []
       }
-    , getAllHeaders
+    , getMeta
     )
 
 
@@ -38,9 +36,8 @@ update msg model =
         ClientConnected _ clientId ->
             ( { model | clients = clientId :: model.clients }
             , Cmd.batch
-                [ Lamdera.sendToFrontend clientId <| GotHeaders model.headers
-
-                --, getAllHeaders
+                [ Lamdera.sendToFrontend clientId <| GotPackages model.packages
+                , getMeta
                 ]
             )
 
@@ -49,15 +46,28 @@ update msg model =
             , Cmd.none
             )
 
-        RequestedAllHeaders apiData ->
-            ( { model | headers = ApiData.fromResult apiData |> Debug.log "headers output" }
-            , Cmd.none
+        GotMetaResponse response ->
+            ( model
+            , Result.map
+                (\okMetas ->
+                    filterMetasToUpdate model.packages okMetas
+                        |> Debug.log "filtered metas"
+                        |> getDependencies
+                        |> Cmd.batch
+                )
+                response
+                |> Result.withDefault Cmd.none
             )
 
-        SyncFired ->
-            ( model
-            , List.map (\c -> Lamdera.sendToFrontend c <| GotHeaders model.headers) model.clients
-                |> Cmd.batch
+        GotPackageResponse package ->
+            ( { model
+                | packages =
+                    Result.toMaybe package
+                        |> Debug.log "package response"
+                        |> Maybe.map (\p -> p :: model.packages)
+                        |> Maybe.withDefault model.packages
+              }
+            , Cmd.none
             )
 
 
@@ -68,16 +78,24 @@ updateFromFrontend sessionId clientId msg model =
             ( model, Cmd.none )
 
 
-getAllHeaders : Cmd BackendMsg
-getAllHeaders =
+getMeta : Cmd BackendMsg
+getMeta =
     Http.get
         { url = "https://package.elm-lang.org/search.json"
-        , expect = Http.expectJson RequestedAllHeaders (Decode.list Header.decoder)
+        , expect = Http.expectJson GotMetaResponse (Decode.list Meta.decoder)
         }
 
 
-
---getDependencies :
+getDependencies : List Meta -> List (Cmd BackendMsg)
+getDependencies metas =
+    List.map
+        (\meta ->
+            Http.get
+                { url = "https://package.elm-lang.org/packages/" ++ meta.name ++ "/" ++ meta.version ++ "/elm.json"
+                , expect = Http.expectJson GotPackageResponse Package.decoder
+                }
+        )
+        metas
 
 
 subscriptions : Model -> Sub BackendMsg
@@ -85,6 +103,18 @@ subscriptions model =
     Sub.batch
         [ Lamdera.onConnect ClientConnected
         , Lamdera.onDisconnect ClientDisconnected
-
-        --, Time.every 1000 (always SyncFired)
         ]
+
+
+filterMetasToUpdate : List Package -> List Meta -> List Meta
+filterMetasToUpdate packages metas =
+    let
+        packageMetas : List Meta
+        packageMetas =
+            List.map (\p -> { name = p.name, version = p.version }) packages
+    in
+    List.filter
+        (\meta ->
+            not <| List.member meta packageMetas
+        )
+        metas

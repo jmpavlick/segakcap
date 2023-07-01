@@ -28,3 +28,19 @@ toMaybe apiData =
 
         _ ->
             Nothing
+
+
+map : (a -> b) -> ApiData a -> ApiData b
+map func value =
+    case value of
+        Loaded a ->
+            Loaded <| func a
+
+        NotAsked ->
+            NotAsked
+
+        Loading ->
+            Loading
+
+        Failed x ->
+            Failed x

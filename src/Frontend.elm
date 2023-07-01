@@ -29,7 +29,7 @@ app =
 init : Url.Url -> Nav.Key -> ( Model, Cmd FrontendMsg )
 init url key =
     ( { key = key
-      , headers = ApiData.NotAsked
+      , packages = []
       }
     , Cmd.none
     )
@@ -60,13 +60,13 @@ update msg model =
 updateFromBackend : ToFrontend -> Model -> ( Model, Cmd FrontendMsg )
 updateFromBackend msg model =
     case msg of
-        GotHeaders headers ->
-            ( { model | headers = headers }, Cmd.none )
+        GotPackages packages ->
+            ( { model | packages = packages }, Cmd.none )
 
 
 view : Model -> Browser.Document FrontendMsg
 view model =
     { title = ""
     , body =
-        [ Html.text <| Debug.toString model.headers ]
+        [ Html.text <| Debug.toString model.packages ]
     }
