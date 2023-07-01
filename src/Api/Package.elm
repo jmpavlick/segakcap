@@ -31,8 +31,8 @@ decoder =
         |> Pipeline.required "dependencies" (Decode.dict Decode.string)
 
 
-filter : List Package -> String -> List ( String, Package )
-filter packages dependencyName =
+filter : List Package -> String -> List { dependencyName : String, packages : List Package }
+filter packages searchForm =
     let
         index : List ( String, Package )
         index =
@@ -45,7 +45,7 @@ filter packages dependencyName =
     in
     List.filterMap
         (\( dep, package ) ->
-            if String.contains dependencyName dep then
+            if String.contains searchForm dep then
                 Just ( dep, package )
 
             else
@@ -53,3 +53,11 @@ filter packages dependencyName =
         )
         index
         |> ListX.unique
+        |> List.sortBy Tuple.first
+        |> ListX.groupWhile (\d1 d2 -> Tuple.first d1 == Tuple.first d2)
+        |> List.map
+            (\( x, xs ) ->
+                { dependencyName = Tuple.first x
+                , packages = List.sortBy .name <| List.map Tuple.second (x :: xs)
+                }
+            )

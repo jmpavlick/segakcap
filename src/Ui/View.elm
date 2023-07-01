@@ -27,10 +27,8 @@ view { packages, searchFormInput, searchMsg } =
         [ searchForm searchMsg searchFormInput
         , if String.length searchFormInput > 2 then
             Element.column [] <|
-                List.map Ui.Package.view <|
-                    List.map Tuple.second <|
-                        List.sortBy (Tuple.second >> .name) <|
-                            Package.filter packages searchFormInput
+                List.map Ui.Package.viewGroup <|
+                    Package.filter packages searchFormInput
 
           else
             Element.text "Enter a package name to search for packages that have it as a dependency."
