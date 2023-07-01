@@ -45,7 +45,7 @@ filter packages searchForm =
     in
     List.filterMap
         (\( dep, package ) ->
-            if String.contains searchForm dep then
+            if String.contains (String.toLower searchForm) (String.toLower dep) then
                 Just ( dep, package )
 
             else
@@ -53,7 +53,7 @@ filter packages searchForm =
         )
         index
         |> ListX.unique
-        |> List.sortBy Tuple.first
+        |> List.sortBy (Tuple.first >> String.toLower)
         |> ListX.groupWhile (\d1 d2 -> Tuple.first d1 == Tuple.first d2)
         |> List.map
             (\( x, xs ) ->
@@ -61,3 +61,5 @@ filter packages searchForm =
                 , packages = List.sortBy .name <| List.map Tuple.second (x :: xs)
                 }
             )
+        |> List.sortBy (\item -> List.length item.packages)
+        |> List.reverse

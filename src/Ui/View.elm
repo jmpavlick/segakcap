@@ -25,8 +25,8 @@ view :
 view { packages, searchFormInput, searchMsg } =
     Element.column []
         [ searchForm searchMsg searchFormInput
-        , if String.length searchFormInput > 2 then
-            Element.column [] <|
+        , if String.length searchFormInput > 0 then
+            Element.column [ Element.spacingXY 0 10 ] <|
                 List.map Ui.Package.viewGroup <|
                     Package.filter packages searchFormInput
 
