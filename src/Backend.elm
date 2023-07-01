@@ -28,7 +28,7 @@ init =
       , dependencies = ApiData.NotAsked
       , clients = []
       }
-    , getAllHeaders |> Debug.log "getAllHeaders fired from init"
+    , getAllHeaders
     )
 
 
@@ -37,7 +37,11 @@ update msg model =
     case msg of
         ClientConnected _ clientId ->
             ( { model | clients = clientId :: model.clients }
-            , Lamdera.sendToFrontend clientId <| GotHeaders model.headers
+            , Cmd.batch
+                [ Lamdera.sendToFrontend clientId <| GotHeaders model.headers
+
+                --, getAllHeaders
+                ]
             )
 
         ClientDisconnected _ clientId ->
