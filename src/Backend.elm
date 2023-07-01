@@ -51,7 +51,6 @@ update msg model =
             , Result.map
                 (\okMetas ->
                     filterMetasToUpdate model.packages okMetas
-                        |> Debug.log "filtered metas"
                         |> getDependencies
                         |> Cmd.batch
                 )
@@ -63,7 +62,6 @@ update msg model =
             ( { model
                 | packages =
                     Result.toMaybe package
-                        |> Debug.log "package response"
                         |> Maybe.map (\p -> p :: model.packages)
                         |> Maybe.withDefault model.packages
               }
