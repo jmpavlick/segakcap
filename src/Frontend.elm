@@ -1,5 +1,6 @@
 module Frontend exposing (..)
 
+import ApiData
 import Browser exposing (UrlRequest(..))
 import Browser.Navigation as Nav
 import Html
@@ -29,6 +30,7 @@ init : Url.Url -> Nav.Key -> ( Model, Cmd FrontendMsg )
 init url key =
     ( { key = key
       , message = "Welcome to Lamdera! You're looking at the auto-generated base implementation. Check out src/Frontend.elm to start coding!"
+      , headers = ApiData.NotAsked
       }
     , Cmd.none
     )
@@ -59,8 +61,8 @@ update msg model =
 updateFromBackend : ToFrontend -> Model -> ( Model, Cmd FrontendMsg )
 updateFromBackend msg model =
     case msg of
-        NoOpToFrontend ->
-            ( model, Cmd.none )
+        GotHeaders headers ->
+            ( { model | headers = headers }, Cmd.none )
 
 
 view : Model -> Browser.Document FrontendMsg
@@ -73,7 +75,7 @@ view model =
                 [ Attr.style "font-family" "sans-serif"
                 , Attr.style "padding-top" "40px"
                 ]
-                [ Html.text model.message ]
+                [ Html.text <| Debug.toString model.headers ]
             ]
         ]
     }
