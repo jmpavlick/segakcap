@@ -13,6 +13,7 @@ import Url exposing (Url)
 type alias FrontendModel =
     { key : Key
     , packages : List Package
+    , searchForm : String
     }
 
 
@@ -25,7 +26,7 @@ type alias BackendModel =
 type FrontendMsg
     = UrlClicked UrlRequest
     | UrlChanged Url
-    | NoOpFrontendMsg
+    | UpdatedSearchForm String
 
 
 type ToBackend

@@ -5,6 +5,7 @@ import Api.Meta exposing (Meta)
 import Dict exposing (Dict)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline as Pipeline
+import List.Extra as ListX
 
 
 type alias Package =
@@ -28,3 +29,27 @@ decoder =
         |> Pipeline.required "exposed-modules" (Decode.list Decode.string)
         |> Pipeline.required "elm-version" Decode.string
         |> Pipeline.required "dependencies" (Decode.dict Decode.string)
+
+
+filter : List Package -> String -> List Package
+filter packages dependencyName =
+    let
+        index : List ( String, Package )
+        index =
+            List.concatMap
+                (\package ->
+                    Dict.keys package.dependencies
+                        |> List.map (\key -> ( key, package ))
+                )
+                packages
+    in
+    List.filterMap
+        (\( dep, package ) ->
+            if String.contains dependencyName dep then
+                Just package
+
+            else
+                Nothing
+        )
+        index
+        |> ListX.unique

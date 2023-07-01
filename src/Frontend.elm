@@ -3,10 +3,12 @@ module Frontend exposing (..)
 import ApiData
 import Browser exposing (UrlRequest(..))
 import Browser.Navigation as Nav
+import Element
 import Html
 import Html.Attributes as Attr
 import Lamdera
 import Types exposing (..)
+import Ui.View as View
 import Url
 
 
@@ -30,6 +32,7 @@ init : Url.Url -> Nav.Key -> ( Model, Cmd FrontendMsg )
 init url key =
     ( { key = key
       , packages = []
+      , searchForm = ""
       }
     , Cmd.none
     )
@@ -53,8 +56,8 @@ update msg model =
         UrlChanged url ->
             ( model, Cmd.none )
 
-        NoOpFrontendMsg ->
-            ( model, Cmd.none )
+        UpdatedSearchForm input ->
+            ( { model | searchForm = input }, Cmd.none )
 
 
 updateFromBackend : ToFrontend -> Model -> ( Model, Cmd FrontendMsg )
@@ -66,7 +69,15 @@ updateFromBackend msg model =
 
 view : Model -> Browser.Document FrontendMsg
 view model =
-    { title = ""
+    { title = "segakcap: reverse dependency search for Elm packages"
     , body =
-        [ Html.text <| Debug.toString model.packages ]
+        [ Element.layout
+            []
+          <|
+            View.view
+                { searchMsg = UpdatedSearchForm
+                , searchFormInput = model.searchForm
+                , packages = model.packages
+                }
+        ]
     }
