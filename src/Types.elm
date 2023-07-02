@@ -7,11 +7,13 @@ import Browser exposing (UrlRequest)
 import Browser.Navigation exposing (Key)
 import Http
 import Lamdera exposing (ClientId, SessionId)
+import Route exposing (Route)
 import Url exposing (Url)
 
 
 type alias FrontendModel =
     { key : Key
+    , route : Maybe Route
     , packages : List Package
     , searchForm : String
     }
