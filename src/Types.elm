@@ -15,7 +15,6 @@ type alias FrontendModel =
     { key : Key
     , route : Maybe Route
     , packages : List Package
-    , searchForm : String
     }
 
 

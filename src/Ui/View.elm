@@ -18,12 +18,11 @@ searchForm toMsg input =
 
 view :
     { packages : List Package
-    , searchFormInput : String
     , searchQuery : Maybe String
     , searchMsg : String -> msg
     }
     -> Element msg
-view { packages, searchFormInput, searchMsg, searchQuery } =
+view { packages, searchMsg, searchQuery } =
     Element.column []
         [ searchForm searchMsg <| Maybe.withDefault "" searchQuery
         , Maybe.map

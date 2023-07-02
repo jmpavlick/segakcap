@@ -34,7 +34,6 @@ init : Url.Url -> Nav.Key -> ( Model, Cmd FrontendMsg )
 init url key =
     ( { key = key
       , packages = []
-      , searchForm = ""
       , route = Route.fromUrl url
       }
     , Cmd.none
@@ -85,7 +84,6 @@ view model =
           <|
             View.view
                 { searchMsg = UpdatedSearchForm
-                , searchFormInput = model.searchForm
                 , searchQuery = Maybe.andThen Route.asSearchQuery model.route
                 , packages = model.packages
                 }
