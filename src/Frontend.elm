@@ -1,12 +1,14 @@
 module Frontend exposing (..)
 
 import ApiData
+import AppUrl
 import Browser exposing (UrlRequest(..))
 import Browser.Navigation as Nav
 import Element
 import Html
 import Html.Attributes as Attr
 import Lamdera
+import Route exposing (Route)
 import Types exposing (..)
 import Ui.View as View
 import Url
@@ -32,7 +34,7 @@ init : Url.Url -> Nav.Key -> ( Model, Cmd FrontendMsg )
 init url key =
     ( { key = key
       , packages = []
-      , searchForm = ""
+      , route = Route.fromUrl url
       }
     , Cmd.none
     )
@@ -54,10 +56,14 @@ update msg model =
                     )
 
         UrlChanged url ->
-            ( model, Cmd.none )
+            ( model
+            , Nav.pushUrl model.key (Url.toString url)
+            )
 
-        UpdatedSearchForm input ->
-            ( { model | searchForm = input }, Cmd.none )
+        UpdatedSearchForm query ->
+            ( { model | route = Just <| Route.Search query }
+            , Cmd.none
+            )
 
 
 updateFromBackend : ToFrontend -> Model -> ( Model, Cmd FrontendMsg )
@@ -76,7 +82,7 @@ view model =
           <|
             View.view
                 { searchMsg = UpdatedSearchForm
-                , searchFormInput = model.searchForm
+                , searchQuery = Maybe.andThen Route.asSearchQuery model.route
                 , packages = model.packages
                 }
         ]
