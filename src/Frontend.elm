@@ -62,8 +62,6 @@ update msg model =
 
         UpdatedSearchForm query ->
             ( { model | route = Just <| Route.Search query }
-              --model
-              --, Nav.pushUrl model.key (Route.toString <| Route.Search query)
             , Cmd.none
             )
 
