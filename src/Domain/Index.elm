@@ -59,7 +59,10 @@ refresh packages =
                 |> List.map
                     (\( x, xs ) ->
                         { dependency = x.dependency
-                        , packages = x.package :: List.map .package xs
+                        , packages =
+                            x.package
+                                :: List.map .package xs
+                                |> ListX.uniqueBy .name
                         , slug = String.toLower x.dependency.name
                         }
                     )
