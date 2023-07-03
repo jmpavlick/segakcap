@@ -1,17 +1,23 @@
-module Backend exposing (..)
+module Backend exposing (Model, app)
 
 import Api.Meta as Meta exposing (Meta)
 import Api.Package as Package exposing (Package)
 import Http
 import Json.Decode as Decode
 import Lamdera exposing (ClientId, SessionId)
-import Types exposing (..)
+import Types exposing (BackendModel, BackendMsg(..), ToBackend(..), ToFrontend(..))
 
 
 type alias Model =
     BackendModel
 
 
+app :
+    { init : ( Model, Cmd BackendMsg )
+    , update : BackendMsg -> Model -> ( Model, Cmd BackendMsg )
+    , updateFromFrontend : SessionId -> ClientId -> ToBackend -> Model -> ( Model, Cmd BackendMsg )
+    , subscriptions : Model -> Sub BackendMsg
+    }
 app =
     Lamdera.backend
         { init = init
@@ -59,11 +65,15 @@ update msg model =
             )
 
         GotPackageResponse package ->
-            ( { model
-                | packages =
+            let
+                packages_ : List Package
+                packages_ =
                     Result.toMaybe package
                         |> Maybe.map (\p -> p :: model.packages)
                         |> Maybe.withDefault model.packages
+            in
+            ( { model
+                | packages = packages_
               }
             , Cmd.none
             )

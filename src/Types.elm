@@ -1,10 +1,10 @@
-module Types exposing (..)
+module Types exposing (BackendModel, BackendMsg(..), FrontendModel, FrontendMsg(..), ToBackend(..), ToFrontend(..))
 
 import Api.Meta exposing (Meta)
 import Api.Package exposing (Package)
-import ApiData exposing (ApiData)
 import Browser exposing (UrlRequest)
 import Browser.Navigation exposing (Key)
+import Domain.Index exposing (Index)
 import Http
 import Lamdera exposing (ClientId, SessionId)
 import Route exposing (Route)
@@ -14,7 +14,7 @@ import Url exposing (Url)
 type alias FrontendModel =
     { key : Key
     , route : Maybe Route
-    , packages : List Package
+    , indexes : List Index
     }
 
 

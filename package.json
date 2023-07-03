@@ -1,0 +1,28 @@
+{
+  "name": "segakcap",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "review": "elm-review",
+    "review-fix": "elm-review --fix",
+    "review-fix-all": "elm-review --fix-all",
+    "review-review": "elm-review --elmjson=\"review/elm.json\" --config=\"review/\" && git checkout review/suppressed",
+    "review-review-fix": "elm-review --fix --elmjson=\"review/elm.json\" --config=\"review/\" && git checkout review/suppressed",
+    "review-suppress": "elm-review suppress",
+    "review-watch": "elm-review --watch --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmpavlick/segakcap.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jmpavlick/segakcap/issues"
+  },
+  "homepage": "https://github.com/jmpavlick/segakcap#readme",
+  "devDependencies": {
+    "elm-review": "^2.10.2"
+  }
+}

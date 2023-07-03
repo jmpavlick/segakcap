@@ -1,9 +1,9 @@
-module Ui.View exposing (..)
+module Ui.View exposing (view)
 
-import Api.Package as Package exposing (Package)
+import Domain.Index as Index exposing (Index)
 import Element exposing (Element)
 import Element.Input as Input
-import Ui.Package
+import Ui.Index
 
 
 searchForm : (String -> msg) -> String -> Element msg
@@ -17,21 +17,30 @@ searchForm toMsg input =
 
 
 view :
-    { packages : List Package
-    , searchQuery : Maybe String
+    { indexes : List Index
+    , query : Maybe String
     , searchMsg : String -> msg
     }
     -> Element msg
-view { packages, searchMsg, searchQuery } =
+view { indexes, query, searchMsg } =
     Element.column []
-        [ searchForm searchMsg <| Maybe.withDefault "" searchQuery
+        [ searchForm searchMsg <| Maybe.withDefault "" query
         , Maybe.map
-            (\query ->
+            (\q ->
                 Element.column [ Element.spacingXY 0 10 ] <|
-                    List.map Ui.Package.viewGroup <|
-                        Package.filter packages query
+                    List.map Ui.Index.view <|
+                        Index.filter indexes q
             )
-            searchQuery
+            (Maybe.andThen
+                (\q ->
+                    if String.length q > 2 then
+                        Just q
+
+                    else
+                        Nothing
+                )
+                query
+            )
             |> Maybe.withDefault
                 (Element.text "Enter a package name to search for packages that have it as a dependency.")
         ]

@@ -58,5 +58,5 @@ migrate_Types_FrontendModel : Evergreen.V1.Types.FrontendModel -> Evergreen.V2.T
 migrate_Types_FrontendModel old =
     { key = old.key
     , route = Nothing
-    , packages = old.packages
+    , indexes = []
     }
