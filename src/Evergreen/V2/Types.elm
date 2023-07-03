@@ -4,6 +4,7 @@ import Browser
 import Browser.Navigation
 import Evergreen.V2.Api.Meta
 import Evergreen.V2.Api.Package
+import Evergreen.V2.Domain.Index
 import Evergreen.V2.Route
 import Http
 import Lamdera
@@ -13,7 +14,7 @@ import Url
 type alias FrontendModel =
     { key : Browser.Navigation.Key
     , route : Maybe Evergreen.V2.Route.Route
-    , packages : List Evergreen.V2.Api.Package.Package
+    , indexes : List Evergreen.V2.Domain.Index.Index
     }
 
 
