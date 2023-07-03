@@ -1,7 +1,7 @@
-module Route exposing (..)
+module Route exposing (Route(..), asSearchQuery, fromUrl)
 
 import AppUrl exposing (AppUrl)
-import Dict exposing (Dict)
+import Dict
 import Url exposing (Url)
 
 
@@ -12,18 +12,6 @@ type Route
 fromUrl : Url -> Maybe Route
 fromUrl =
     AppUrl.fromUrl >> fromAppUrl
-
-
-toString : Route -> String
-toString route =
-    case route of
-        Search query ->
-            AppUrl.toString
-                { path = [ "search" ]
-                , queryParameters =
-                    Dict.fromList [ ( "q", [ query ] ) ]
-                , fragment = Nothing
-                }
 
 
 fromAppUrl : AppUrl -> Maybe Route

@@ -1,15 +1,12 @@
-module Frontend exposing (..)
+module Frontend exposing (Model, app)
 
-import ApiData
-import AppUrl
 import Browser exposing (UrlRequest(..))
 import Browser.Navigation as Nav
+import Domain.Index as Index
 import Element
-import Html
-import Html.Attributes as Attr
 import Lamdera
-import Route exposing (Route)
-import Types exposing (..)
+import Route
+import Types exposing (FrontendModel, FrontendMsg(..), ToFrontend(..))
 import Ui.View as View
 import Url
 
@@ -18,6 +15,15 @@ type alias Model =
     FrontendModel
 
 
+app :
+    { init : Lamdera.Url -> Nav.Key -> ( Model, Cmd FrontendMsg )
+    , view : Model -> Browser.Document FrontendMsg
+    , update : FrontendMsg -> Model -> ( Model, Cmd FrontendMsg )
+    , updateFromBackend : ToFrontend -> Model -> ( Model, Cmd FrontendMsg )
+    , subscriptions : Model -> Sub FrontendMsg
+    , onUrlRequest : UrlRequest -> FrontendMsg
+    , onUrlChange : Url.Url -> FrontendMsg
+    }
 app =
     Lamdera.frontend
         { init = init
@@ -25,7 +31,7 @@ app =
         , onUrlChange = UrlChanged
         , update = update
         , updateFromBackend = updateFromBackend
-        , subscriptions = \m -> Sub.none
+        , subscriptions = \_ -> Sub.none
         , view = view
         }
 
@@ -33,8 +39,8 @@ app =
 init : Url.Url -> Nav.Key -> ( Model, Cmd FrontendMsg )
 init url key =
     ( { key = key
-      , packages = []
       , route = Route.fromUrl url
+      , indexes = []
       }
     , Cmd.none
     )
@@ -70,7 +76,7 @@ updateFromBackend : ToFrontend -> Model -> ( Model, Cmd FrontendMsg )
 updateFromBackend msg model =
     case msg of
         GotPackages packages ->
-            ( { model | packages = packages }, Cmd.none )
+            ( { model | indexes = Index.refresh packages }, Cmd.none )
 
 
 view : Model -> Browser.Document FrontendMsg
@@ -82,8 +88,8 @@ view model =
           <|
             View.view
                 { searchMsg = UpdatedSearchForm
-                , searchQuery = Maybe.andThen Route.asSearchQuery model.route
-                , packages = model.packages
+                , query = Maybe.andThen Route.asSearchQuery model.route
+                , indexes = model.indexes
                 }
         ]
     }
