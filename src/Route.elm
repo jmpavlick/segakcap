@@ -1,12 +1,14 @@
-module Route exposing (Route(..), asSearchQuery, fromUrl)
+module Route exposing (Route(..), asSearchQuery, fromUrl, link)
 
 import AppUrl exposing (AppUrl)
 import Dict
+import Element exposing (Element)
 import Url exposing (Url)
 
 
 type Route
     = Search String
+    | Home
 
 
 fromUrl : Url -> Maybe Route
@@ -22,6 +24,9 @@ fromAppUrl appUrl =
                 |> Maybe.andThen List.head
                 |> Maybe.map Search
 
+        [] ->
+            Just Home
+
         _ ->
             Nothing
 
@@ -31,3 +36,21 @@ asSearchQuery route =
     case route of
         Search query ->
             Just query
+
+        _ ->
+            Nothing
+
+
+toUrlString : Route -> String
+toUrlString route =
+    case route of
+        Search query ->
+            "/search?q=" ++ query
+
+        Home ->
+            "/"
+
+
+link : List (Element.Attribute msg) -> { label : Element msg, route : Route } -> Element msg
+link attrs { label, route } =
+    Element.link attrs { url = toUrlString route, label = label }
