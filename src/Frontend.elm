@@ -62,8 +62,8 @@ update msg model =
                     )
 
         UrlChanged url ->
-            ( model
-            , Nav.pushUrl model.key (Url.toString url)
+            ( { model | route = Route.fromUrl url }
+            , Cmd.none
             )
 
         UpdatedSearchForm query ->
@@ -84,12 +84,13 @@ view model =
     { title = "segakcap: reverse dependency search for Elm packages"
     , body =
         [ Element.layout
-            []
+            [ Element.width Element.fill ]
           <|
-            View.view
-                { searchMsg = UpdatedSearchForm
-                , query = Maybe.andThen Route.asSearchQuery model.route
-                , indexes = model.indexes
-                }
+            Element.el [ Element.width Element.fill, Element.centerX ] <|
+                View.view
+                    { searchMsg = UpdatedSearchForm
+                    , query = Maybe.andThen Route.asSearchQuery model.route
+                    , indexes = model.indexes
+                    }
         ]
     }

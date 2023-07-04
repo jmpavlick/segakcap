@@ -63,6 +63,7 @@ refresh packages =
                             x.package
                                 :: List.map .package xs
                                 |> ListX.uniqueBy .name
+                                |> List.sortBy (.name >> String.toLower)
                         , slug = String.toLower x.dependency.name
                         }
                     )
