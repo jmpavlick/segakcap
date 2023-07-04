@@ -91,7 +91,7 @@ header =
                 { route = Route.Home
                 , label =
                     Element.image [ Element.width <| Element.px 50, Element.height <| Element.px 50 ]
-                        { src = "public/logo.svg", description = "segakcap logo" }
+                        { src = "/logo.svg", description = "segakcap logo" }
                 }
             , Element.column []
                 [ Element.el [ fontSize.title ] <| Element.text "segakcap"
