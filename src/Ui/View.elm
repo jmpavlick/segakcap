@@ -148,7 +148,6 @@ results { indexes, orphanedPackages } query =
 matchingIndexes : String -> List Index -> Maybe (Element msg)
 matchingIndexes query indexes =
     Index.filter indexes query
-        |> Debug.log "filtered indexes"
         |> ListE.mapNonEmpty Ui.Index.view
         |> Maybe.map (Element.column [ Element.spacingXY 0 10 ])
 
