@@ -211,7 +211,10 @@ searchForm toMsg input =
 
 footer : Element msg
 footer =
-    Element.row [ Element.centerX, fontSize.small, Font.color color.lightGray ]
-        [ Element.text "made with love for the elm community by "
-        , Element.newTabLink [] { url = "https://twitter.com/lambdapriest", label = Element.el [ Font.underline ] <| Element.text "@lambdapriest" }
+    Element.column [ Element.centerX, fontSize.small, Font.color color.lightGray ]
+        [ Element.paragraph []
+            [ Element.text "made with love for the elm community by "
+            , Element.newTabLink [] { url = "https://twitter.com/lambdapriest", label = Element.el [ Font.underline ] <| Element.text "@lambdapriest" }
+            ]
+        , Element.link [ Element.centerX ] { url = "https://github.com/jmpavlick/segakcap", label = Element.el [ Font.underline ] <| Element.text "source" }
         ]
