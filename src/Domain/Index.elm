@@ -1,4 +1,4 @@
-module Domain.Index exposing (Index, filter, refresh)
+module Domain.Index exposing (Index, filter, orphanedPackages, refresh)
 
 import Api.Package exposing (Package)
 import Dict
@@ -63,7 +63,7 @@ refresh packages =
                             x.package
                                 :: List.map .package xs
                                 |> ListX.uniqueBy .name
-                                |> List.sortBy (.name >> String.toLower)
+                                |> List.sortBy .slug
                         , slug = String.toLower x.dependency.name
                         }
                     )
@@ -81,3 +81,14 @@ filter indexes query =
         indexes
         |> List.sortBy (\i -> List.length i.packages)
         |> List.reverse
+
+
+orphanedPackages : List Index -> List Package -> List Package
+orphanedPackages index packages =
+    let
+        indexedPackageNames : List String
+        indexedPackageNames =
+            List.map .dependency index |> List.map .name |> List.sort
+    in
+    List.sortBy .name packages
+        |> ListX.filterNot (\p -> List.member p.name indexedPackageNames)

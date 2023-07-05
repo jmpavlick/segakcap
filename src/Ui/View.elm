@@ -1,12 +1,16 @@
 module Ui.View exposing (view)
 
+import Api.Package as Package exposing (Package)
 import Domain.Index as Index exposing (Index)
 import Element exposing (Element)
 import Element.Background as Background
 import Element.Font as Font
 import Element.Input as Input
+import List.Extensions as ListE
+import Maybe.Extra as MaybeX
 import Route
 import Ui.Index
+import Ui.Package
 
 
 
@@ -41,6 +45,7 @@ fontSize =
 
 view :
     { indexes : List Index
+    , orphanedPackages : List Package
     , query : Maybe String
     , searchMsg : String -> msg
     }
@@ -108,35 +113,62 @@ header =
 
 body :
     { indexes : List Index
+    , orphanedPackages : List Package
     , query : Maybe String
     , searchMsg : String -> msg
     }
     -> Element msg
-body { indexes, query, searchMsg } =
+body { indexes, orphanedPackages, query, searchMsg } =
     Element.row [ Element.width Element.fill ]
         [ Element.el [ Element.width <| Element.fillPortion 2 ] Element.none
         , Element.column [ Element.spacing 4, Element.width <| Element.fillPortion 6 ]
             [ Element.el [ Element.width Element.fill ] <| searchForm searchMsg <| Maybe.withDefault "" query
-            , Maybe.map
-                (\q ->
-                    Element.column [ Element.spacingXY 0 10 ] <|
-                        List.map Ui.Index.view <|
-                            Index.filter indexes q
-                )
-                (Maybe.andThen
-                    (\q ->
-                        if String.length q > 2 then
-                            Just q
-
-                        else
-                            Nothing
-                    )
-                    query
-                )
+            , Maybe.map (results { indexes = indexes, orphanedPackages = orphanedPackages }) query
                 |> Maybe.withDefault default
             ]
         , Element.el [ Element.width <| Element.fillPortion 2 ] Element.none
         ]
+
+
+results : { indexes : List Index, orphanedPackages : List Package } -> String -> Element msg
+results { indexes, orphanedPackages } query =
+    MaybeX.orListLazy
+        [ \() -> matchingIndexes query indexes
+        , \() -> matchingOrphanedPackages query orphanedPackages
+        , \() ->
+            if List.isEmpty indexes || List.isEmpty orphanedPackages then
+                Just <| Element.el [ Font.color color.lightGray ] <| Element.text "Loading..."
+
+            else
+                Just noMatches
+        ]
+        |> Maybe.withDefault Element.none
+
+
+matchingIndexes : String -> List Index -> Maybe (Element msg)
+matchingIndexes query indexes =
+    Index.filter indexes query
+        |> Debug.log "filtered indexes"
+        |> ListE.mapNonEmpty Ui.Index.view
+        |> Maybe.map (Element.column [ Element.spacingXY 0 10 ])
+
+
+matchingOrphanedPackages : String -> List Package -> Maybe (Element msg)
+matchingOrphanedPackages query packages =
+    Package.filter packages query
+        |> ListE.mapNonEmpty Ui.Package.view
+        |> Maybe.map
+            (\orphanedViews ->
+                Element.column [ Element.spacing 4 ]
+                    [ Element.el [ Element.centerX ] <| Element.text "None of the packages matching your query are a dependency of any other packages - but here they are:"
+                    , Element.column [ Element.spacingXY 0 10 ] orphanedViews
+                    ]
+            )
+
+
+noMatches : Element msg
+noMatches =
+    Element.el [] <| Element.text "No packages match your query."
 
 
 default : Element msg
