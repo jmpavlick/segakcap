@@ -83,7 +83,7 @@ migrate_Types_FrontendModel old =
 migrate_Api_Package_Package : Evergreen.V4.Api.Package.Package -> Evergreen.V6.Api.Package.Package
 migrate_Api_Package_Package old =
     { name = old.name
-    , slug = (Unimplemented {- Type `String` was added in V6. I need you to set a default value. -})
+    , slug = String.toLower old.name
     , summary = old.summary
     , license = old.license
     , version = old.version
