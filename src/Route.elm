@@ -35,7 +35,11 @@ asSearchQuery : Route -> Maybe String
 asSearchQuery route =
     case route of
         Search query ->
-            Just query
+            if String.isEmpty query then
+                Nothing
+
+            else
+                Just query
 
         _ ->
             Nothing
