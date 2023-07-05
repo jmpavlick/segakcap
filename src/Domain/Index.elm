@@ -22,13 +22,9 @@ refresh packages =
                 |> List.concatMap
                     (\package ->
                         Dict.keys package.dependencies
-                            |> List.filterMap
+                            |> List.map
                                 (\key ->
-                                    if key == "elm/core" then
-                                        Nothing
-
-                                    else
-                                        Just ( key, package )
+                                    ( key, package )
                                 )
                     )
 
@@ -71,6 +67,7 @@ refresh packages =
     join_
         dependencies
         packagesKeyed
+        |> ListX.filterNot (\i -> i.dependency.name == "elm/core")
         |> group
 
 
