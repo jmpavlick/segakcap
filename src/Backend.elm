@@ -5,6 +5,7 @@ import Api.Package as Package exposing (Package)
 import Http
 import Json.Decode as Decode
 import Lamdera exposing (ClientId, SessionId)
+import Time
 import Types exposing (BackendModel, BackendMsg(..), ToBackend(..), ToFrontend(..))
 
 
@@ -23,7 +24,7 @@ app =
         { init = init
         , update = update
         , updateFromFrontend = updateFromFrontend
-        , subscriptions = subscriptions
+        , subscriptions = always subscriptions
         }
 
 
@@ -41,10 +42,7 @@ update msg model =
     case msg of
         ClientConnected _ clientId ->
             ( { model | clients = clientId :: model.clients }
-            , Cmd.batch
-                [ Lamdera.sendToFrontend clientId <| GotPackages model.packages
-                , getMeta
-                ]
+            , Lamdera.sendToFrontend clientId <| GotPackages model.packages
             )
 
         ClientDisconnected _ clientId ->
@@ -75,7 +73,13 @@ update msg model =
             ( { model
                 | packages = packages_
               }
-            , Cmd.none
+            , Cmd.batch <|
+                List.map (\clientId -> Lamdera.sendToFrontend clientId <| GotPackages packages_) model.clients
+            )
+
+        RefreshScheduleFired ->
+            ( model
+            , getMeta
             )
 
 
@@ -106,11 +110,12 @@ getDependencies metas =
         metas
 
 
-subscriptions : Model -> Sub BackendMsg
-subscriptions model =
+subscriptions : Sub BackendMsg
+subscriptions =
     Sub.batch
         [ Lamdera.onConnect ClientConnected
         , Lamdera.onDisconnect ClientDisconnected
+        , Time.every (1000 * 60) (always RefreshScheduleFired)
         ]
 
 

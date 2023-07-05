@@ -40,6 +40,7 @@ type BackendMsg
     | ClientDisconnected SessionId ClientId
     | GotMetaResponse (Result Http.Error (List Meta))
     | GotPackageResponse (Result Http.Error Package)
+    | RefreshScheduleFired
 
 
 type ToFrontend
