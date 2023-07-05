@@ -2,7 +2,7 @@ module Frontend exposing (Model, app)
 
 import Browser exposing (UrlRequest(..))
 import Browser.Navigation as Nav
-import Domain.Index as Index
+import Domain.Index as Index exposing (Index)
 import Element
 import Lamdera
 import Route
@@ -41,6 +41,7 @@ init url key =
     ( { key = key
       , route = Route.fromUrl url
       , indexes = []
+      , orphanedPackges = []
       }
     , Cmd.none
     )
@@ -76,7 +77,12 @@ updateFromBackend : ToFrontend -> Model -> ( Model, Cmd FrontendMsg )
 updateFromBackend msg model =
     case msg of
         GotPackages packages ->
-            ( { model | indexes = Index.refresh packages }, Cmd.none )
+            let
+                indexes : List Index
+                indexes =
+                    Index.refresh packages
+            in
+            ( { model | indexes = indexes, orphanedPackges = Index.orphanedPackages indexes packages }, Cmd.none )
 
 
 view : Model -> Browser.Document FrontendMsg
@@ -91,6 +97,7 @@ view model =
                     { searchMsg = UpdatedSearchForm
                     , query = Maybe.andThen Route.asSearchQuery model.route
                     , indexes = model.indexes
+                    , orphanedPackages = model.orphanedPackges
                     }
         ]
     }
