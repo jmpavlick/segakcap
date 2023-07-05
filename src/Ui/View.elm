@@ -173,8 +173,8 @@ noMatches =
 default : Element msg
 default =
     Element.column [ Element.centerX, Element.spacing 4 ]
-        [ Element.text "Enter a package name to search for packages that have it as a dependency."
-        , Element.el [ Element.centerX ] <| Element.text "Here are some popular ones:"
+        [ Element.paragraph [] [ Element.text "Enter a package name to search for packages that have it as a dependency." ]
+        , Element.el [ Element.centerX, Element.paddingXY 0 10 ] <| Element.text "Here are some popular ones:"
         , featuredPackageLink "jfmengels/elm-review"
         , featuredPackageLink "mdgriffith/elm-ui"
         ]
@@ -211,10 +211,13 @@ searchForm toMsg input =
 
 footer : Element msg
 footer =
-    Element.column [ Element.centerX, fontSize.small, Font.color color.lightGray ]
-        [ Element.paragraph []
-            [ Element.text "made with love for the elm community by "
-            , Element.newTabLink [] { url = "https://twitter.com/lambdapriest", label = Element.el [ Font.underline ] <| Element.text "@lambdapriest" }
+    Element.column [ Element.centerX, fontSize.small, Font.color color.lightGray, Element.paddingXY 0 20 ]
+        [ Element.column [ Element.centerX ]
+            [ Element.text "made with love for the elm community "
+            , Element.wrappedRow [ Element.centerX ]
+                [ Element.text "by "
+                , Element.newTabLink [] { url = "https://twitter.com/lambdapriest", label = Element.el [ Font.underline ] <| Element.text "@lambdapriest" }
+                ]
             ]
         , Element.link [ Element.centerX ] { url = "https://github.com/jmpavlick/segakcap", label = Element.el [ Font.underline ] <| Element.text "source" }
         ]

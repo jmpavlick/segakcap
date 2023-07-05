@@ -12,5 +12,5 @@ view package =
             { url = "https://package.elm-lang.org/packages/" ++ package.name ++ "/latest/"
             , label = Element.el [ Font.underline ] <| Element.text package.name
             }
-        , Element.el [] <| Element.text package.summary
+        , Element.paragraph [] [ Element.text package.summary ]
         ]
