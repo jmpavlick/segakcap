@@ -74,7 +74,7 @@ update msg model =
                 | packages = packages_
               }
             , Cmd.batch <|
-                List.map (\clientId -> Lamdera.sendToFrontend clientId <| GotPackages packages_) model.clients
+                List.map (\clientId -> Lamdera.broadcast <| GotPackages packages_) model.clients
             )
 
         RefreshScheduleFired ->
