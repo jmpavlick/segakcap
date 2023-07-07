@@ -8,6 +8,7 @@ import Domain.Index exposing (Index)
 import Http
 import Lamdera exposing (ClientId, SessionId)
 import Route exposing (Route)
+import Set exposing (Set)
 import Url exposing (Url)
 
 
@@ -20,7 +21,7 @@ type alias FrontendModel =
 
 
 type alias BackendModel =
-    { clients : List ClientId
+    { clients : Set ClientId
     , packages : List Package
     }
 
