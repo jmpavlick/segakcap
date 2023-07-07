@@ -74,7 +74,7 @@ update msg model =
             ( { model
                 | packages = packages_
               }
-            , Lamdera.broadcast <| GotPackages packages_
+            , Cmd.none
             )
 
         RefreshScheduleFired ->
@@ -115,7 +115,7 @@ subscriptions =
     Sub.batch
         [ Lamdera.onConnect ClientConnected
         , Lamdera.onDisconnect ClientDisconnected
-        , Time.every (1000 * 60) (always RefreshScheduleFired)
+        , Time.every (1000 * 60 * 5) (always RefreshScheduleFired)
         ]
 
 
